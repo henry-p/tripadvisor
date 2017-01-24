@@ -1,4 +1,5 @@
-load("~/Dropbox/Universität/Information Systems M.Sc./_Data Analaytics I WT 2016/Case Studies/tripadvisor-muenster.RData")
+file = paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/tripadvisor-muenster.RData")
+load(file)
 # Remove useless columns
 hotels = tripadvisor3$tripadvisor[, -which(names(tripadvisor3$tripadvisor) %in%
                                         c("hotel_address", "hotel_city", "hotel_region", "hotel_country",
