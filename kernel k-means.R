@@ -4,7 +4,7 @@ library(kernlab)
 m = as.matrix(hotels.features) * 1
 
 # Define the maximum number of clusters that kkmeans runs on
-nrClusters = 10
+nrClusters = 15
 
 # Calculate Kernel k-Means, using data [x], kernel function [kernel], for all clusters from 1 to [nrClusters].
 # Save result in a list.
@@ -39,12 +39,14 @@ kkmeans.result.anovadot = kkmeansWrapper(m, "anovadot", nrClusters)
 # kkmeans.result.stringdot = kkmeansWrapper(m, "stringdot", nrClusters)
 
 # Plot the total-within-sum-of-squares metric against the corresponding number of clusters
-plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.rbfdot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
-plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.polydot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
-plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.vanilladot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
-# plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.tanhdot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
-plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.laplacedot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
-plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.besseldot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
-plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.anovadot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
-# plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.splinedot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
-# plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.stringdot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
+pdf(file='plots.pdf')
+  plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.rbfdot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
+  plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.polydot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
+  plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.vanilladot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
+  # plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.tanhdot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
+  plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.laplacedot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
+  plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.besseldot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
+  plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.anovadot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
+  # plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.splinedot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
+  # plot(seq_len(nrClusters), kkmeansTWSS(kkmeans.result.stringdot), type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
+dev.off()
