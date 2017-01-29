@@ -5,9 +5,7 @@ plot(reductionResult, type = "l")
 summary(reductionResult)
 
 # Different way
-ratings <- cbind(hotels.total$rating_total, hotels.features * 1)
-ratings <- na.omit(ratings)
-regLinearR <- lm(ratings$`hotels.total$rating_total` ~ ., data = ratings)
+regLinearR <- lm(hotels.noNA$rating_total ~ ., data = hotels.noNA)
 summary(regLinearR)
 
 pricing <- cbind(hotels.total$hotel_price, hotels.features * 1)
