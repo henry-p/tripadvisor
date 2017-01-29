@@ -1,10 +1,10 @@
 #install.packages("ggmap")
 library(ggmap)
 
-meanLat = mean(hotels$latitude, na.rm = TRUE)
-meanLon = mean(hotels$longitude, na.rm = TRUE)
+meanLat = mean(hotels.total$latitude, na.rm = TRUE)
+meanLon = mean(hotels.total$longitude, na.rm = TRUE)
 
-coordinatesHotels = na.omit(data.frame(lat = hotels[, "latitude"], lon = hotels[, "longitude"]))
+coordinateshotels.total = na.omit(data.frame(lat = hotels.total[, "latitude"], lon = hotels.total[, "longitude"]))
 coordinatesAttractions = data.frame(lat = top3attractions[, "latitude"], lon = top3attractions[, "longitude"])
 
 gmapsObject <- get_map(location = c(lon = meanLon, lat = meanLat),
@@ -15,6 +15,6 @@ gmapsObject <- get_map(location = c(lon = meanLon, lat = meanLat),
 
 gmap <- ggmap(gmapsObject, extent = "normal")
 
-gmap + labs(x = 'Longitude', y = 'Latitude') + ggtitle("Tripadvisor Hotels & Attractions") +
-geom_point(data = coordinatesHotels, color = "cornflowerblue", size = 1.5) +
+gmap + labs(x = 'Longitude', y = 'Latitude') + ggtitle("Tripadvisor hotels.total & Attractions") +
+geom_point(data = coordinateshotels.total, color = "cornflowerblue", size = 1.5) +
 geom_point(data = coordinatesAttractions, color = "firebrick2", size = 2)
