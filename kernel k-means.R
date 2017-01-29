@@ -22,7 +22,7 @@ kkmeansWrapper = function(x, kernel, nrClusters) {
   return(result)
 }
 
-# Extract the total within-sum-of-squares for all kkmeans result-objects, that contain results for all clusters from 1 to [nrClusters]
+# Extract the total within-sum-of-squares from kkmeans result-object, that contains results for all clusters from 1 to [nrClusters]
 kkmeansTWSS = function(kkmeans.result) {
   sapply(kkmeans.result, function(kkm) {sum(kkm$withinss)})
 }
