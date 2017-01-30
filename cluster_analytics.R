@@ -1,5 +1,5 @@
 d <- reductionResult$x[,1:25] # Remove feature which could downgrade results; 25 -> >98%
-e <- as.factors(reductionData)
+e <- as.factor(reductionData)
 
 ### K-Means ###
 wss <- 0
@@ -20,3 +20,4 @@ abline(h=17, col="red")
 groupsD4 = cutree(clustersD, k=4)
 hotels.clustered.hier = cbind(hotels.total[-c(15:59)], groupsD4)
 hotels.clustered = cbind(hotels.clustered, groupsD4)
+
