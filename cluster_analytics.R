@@ -1,5 +1,5 @@
 d <- reductionResult$x[,1:25] # Remove feature which could downgrade results; 25 -> >98%
-e <- as.factors(reductionData)
+e <- as.factor(reductionData)
 
 ### K-Means ###
 wss <- 0
@@ -24,7 +24,7 @@ abline(h=17, col="red")
 
 ### Add clusters to hotels (only four clusters) ###
 groupsD4 = cutree(clustersD, k=4)
-hotels.total = cbind(hotels.total, groupsD4)
-hotels.clustered = hotels.total[-c(15:59)]
+hotels.hierarchical = cbind(hotels.total, groupsD4)
+hotels.clustered = hotels.hierarchical[-c(15:59)]
 
 

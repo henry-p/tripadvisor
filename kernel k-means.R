@@ -2,6 +2,9 @@ library(kernlab)
 
 # Save binary feature values from hotels as a numeric [0, 1] matrix
 m = as.matrix(hotels.features) * 1
+maxs = apply(m, 2, max)
+mins = apply(m, 2, min)
+m = scale(m, center = mins, scale = maxs - mins)
 
 # Define the maximum number of clusters that kkmeans runs on
 nrClusters = 15
