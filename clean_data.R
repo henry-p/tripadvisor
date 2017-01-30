@@ -12,6 +12,9 @@ hotels.total = tripadvisor3$tripadvisor[, -which(names(tripadvisor3$tripadvisor)
 # one hotel appears three times (32,1,11). so lets remove them
 hotels.total = hotels.total[-c(1,11),]
 
+# All numeric features
+hotels.numeric <- hotels.total[ ,sapply(hotels.total, is.numeric)]
+
 # Remove unusable features in f1_ .. f45_ which are all TRUE or all FALSE
 hotels.features = hotels.total[15:59]
 del = c()
