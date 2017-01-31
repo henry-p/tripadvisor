@@ -414,6 +414,7 @@ text(x= cntOrdered[,2]+1, y= brplt, labels=as.character(cntOrdered[,2]), xpd=TRU
 
 ##### ---------- (STANDARD) K-MEANS AND HIERARCHICAL CLUSTERING ---------- #####
 ## K-Means
+PCs = reductionResult$x[, 1:17]
 wss <- 0
 for (i in 1:20) wss[i] <- sum(kmeans(PCs,centers=i)$withinss)
 plot(1:20, wss, type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
