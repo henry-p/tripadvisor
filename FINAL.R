@@ -1,7 +1,28 @@
 ##### ---------- LOAD AND CLEAN DATA ---------- #####
 file = paste0(dirname(rstudioapi::getActiveDocumentContext()$path), "/tripadvisor-muenster.RData")
 load(file)
+#install.packages("stats")
+#install.packages("rgl")
+#install.packages("ggmap")
+#install.packages("nortest")
+#install.packages("corrplot")
+#install.packages("randomForest")
+#install.packages("rgl")
+#install.packages("gplots")
+#install.packages("ggmap")
+#install.packages("kernlab")
+#install.packages("ggmap")
 library(stats)
+library(rgl)
+library(ggmap)
+library(nortest)
+library(corrplot)
+library(randomForest)
+library(rgl)
+library(gplots)
+library(ggmap)
+library(kernlab)
+library(ggmap)
 
 # Remove useless columns
 hotels.total = tripadvisor3$tripadvisor[, -which(names(tripadvisor3$tripadvisor) %in%
@@ -35,7 +56,6 @@ top3attractions = top3attractions[, -4]
 
 
 ##### ---------- DATA VISUALIZATION EXAMPLE ---------- #####
-library(rgl)
 
 x = c(FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, TRUE, TRUE)
 y = c(FALSE, FALSE, TRUE, FALSE, TRUE, TRUE, FALSE, TRUE)
@@ -46,8 +66,6 @@ rgl::plot3d(x = x, y = y, z = z, size = 10, col = "steelblue", expand=1.2)
 
 ##### ---------- HOTELS ON THE MAP VISUALIZATIONS ---------- #####
 
-#install.packages("ggmap")
-library(ggmap)
 
 meanLat = mean(hotels.total$latitude, na.rm = TRUE)
 meanLon = mean(hotels.total$longitude, na.rm = TRUE)
@@ -187,8 +205,6 @@ sapply(colnames(nb.data), function(x){
 
 ##Anderson-Darling test
 
-# install.packages("nortest")
-library(nortest)
 ad.test(nb.data$count_ratings_total)
 ad.test(nb.data$count_ratings_family)
 ad.test(nb.data$count_ratings_couple)
@@ -215,7 +231,6 @@ sapply(colnames(nb.data), function(x){
 
 ##### ---------- CORRELATION, REGRESSION, BARPLOT, QQPLOT ANALYSIS ---------- #####
 ## correlation
-library(corrplot)
 
 # correlation (non-binary data)
 p.cor <- cor(hotels.noNA[c(60, 3:5, 8, 13, 64)])
@@ -318,12 +333,6 @@ pairs(hotels.noNA[c(3:5,8:13,60)], cex = 0.4, pch = 21, col = "dodgerblue3", bg 
 
 
 ##### ---------- DIMENSIONALITY REDUCTION ---------- #####
-# install.packages("randomForest")
-# install.packages("rgl")
-# install.packages("gplots")
-library(randomForest)
-library(rgl)
-library(gplots)
 # reductionData <- get Features from CleanData
 features.scaled <- as.data.frame(apply(hotels.features *1, 2, scale))
 reductionResult = prcomp(features.scaled)
@@ -438,8 +447,6 @@ hotels.clustered = hotels.hierarchical[-c(15:59)]
 
 
 ##### ---------- MAP HOTELS ---------- #####
-#install.packages("ggmap")
-library(ggmap)
 
 meanLat = mean(hotels.total$latitude, na.rm = TRUE)
 meanLon = mean(hotels.total$longitude, na.rm = TRUE)
@@ -467,7 +474,6 @@ gmap + labs(x = 'Longitude', y = 'Latitude') + ggtitle("Tripadvisor Hotels & Att
 
 
 ##### ---------- KERNEL K-MEANS ---------- #####
-library(kernlab)
 
 # Save binary feature values from hotels as a numeric [0, 1] matrix
 m = as.matrix(hotels.features) * 1
@@ -607,7 +613,6 @@ hier.anovadot.best.match = getBestMatchCluster(mappableHotels,
 
 
 ##### ---------- MAP BEST MATCHING CLUSTERS ---------- #####
-library(ggmap)
 
 meanLat = mean(hotels.total$latitude, na.rm = TRUE)
 meanLon = mean(hotels.total$longitude, na.rm = TRUE)
