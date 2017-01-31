@@ -44,12 +44,210 @@ z = c(FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE)
 rgl::plot3d(x = x, y = y, z = z, size = 10, col = "steelblue", expand=1.2)
 ##### ---------- /DATA VISUALIZATION EXAMPLE ---------- #####
 
+##### ---------- DISTRIBUTIONS AND NORMALITY TEST ---------- #####
 
+checkdistr = hotels.total[c(3,4,8:14,60, 64)]
+
+layout(matrix(1:6, nrow = 2, ncol = 3))
+
+# Kernel Density Plot for continuous data and Box plot for categorical data
+
+d1 <- density(na.omit(checkdistr$hotel_price)) # returns the density data
+hist(checkdistr$hotel_price, col="green", main = "Price",  freq = FALSE, xlab = "Price")
+polygon(d1, border="blue")
+
+d2 <- density(na.omit(checkdistr$number_of_rooms)) # returns the density data
+hist(checkdistr$number_of_rooms, col="green", main = "Rooms", freq = FALSE, xlab = "Rooms")
+polygon(d2, border = "blue")
+
+d4 <- density(na.omit(checkdistr$city_ranking)) # returns the density data
+hist(checkdistr$city_ranking, col="green", main = "City Rank", freq = FALSE, xlab = "City Ranking")
+polygon(d4, border="blue")
+
+d5 <- density(na.omit(checkdistr$distance_to_city_center)) # returns the density data
+hist(checkdistr$distance_to_city_center, col="green", main = "Distance to Center", freq = FALSE, xlab = "Distance in km")
+polygon(d5, border="blue")
+
+boxplot(checkdistr$rating_total, col="green", main = "Rating", freq = FALSE, ylab = "Rating")
+
+boxplot(checkdistr$hotel_stars, col="green", main = "Stars", freq = FALSE, ylab = "Stars")
+
+#tests for normality
+
+nb.data <- hotels.noNA[c(4:5, 9:13, 60:64)]
+layout(matrix(1:12, ncol = 4, nrow = 3))
+
+sapply(colnames(nb.data), function(x){
+  qqnorm(nb.data[[x]], main = x, pch = 19, cex.lab = 1, cex.main = 1, ylab = "")
+  qqline(nb.data[[x]], lwd = 0.6, col = "red")
+})
+
+#qqplot for log normal distribution
+nb.data.log <- log(nb.data + 1)
+layout(matrix(1:12, ncol = 4, nrow = 3))
+
+sapply(colnames(nb.data.log), function(x){
+  qqnorm(nb.data.log[[x]], main = x, pch = 19, cex.lab = 1, cex.main = 1, ylab = "")
+  qqline(nb.data.log[[x]], lwd = 0.6, col = "red")
+})
+
+#qqplot for square distribution
+nb.data.sqrt <- sqrt(nb.data)
+layout(matrix(1:12, ncol = 4, nrow = 3))
+
+sapply(colnames(nb.data.sqrt), function(x){
+  qqnorm(nb.data.sqrt[[x]], main = x, pch = 19, cex.lab = 1, cex.main = 1, ylab = "")
+  qqline(nb.data.sqrt[[x]], lwd = 0.6, col = "red")
+})
+
+#shapro-wilk test
+
+shapiro.test(nb.data$count_ratings_total)
+shapiro.test(nb.data$count_ratings_family)
+shapiro.test(nb.data$count_ratings_couple)
+shapiro.test(nb.data$count_ratings_single)
+shapiro.test(nb.data$count_ratings_business)
+shapiro.test(nb.data$foto_count)
+shapiro.test(nb.data$number_of_rooms)
+shapiro.test(nb.data$hotel_price)
+shapiro.test(nb.data$distance_to_sight1)
+shapiro.test(nb.data$distance_to_sight2)
+shapiro.test(nb.data$distance_to_sight3)
+shapiro.test(nb.data$distance_to_city_center)
+sapply(colnames(nb.data), function(x){
+  shapiro.test(as.numeric(nb.data[[x]]))
+})
+layout(matrix(1:12, ncol=4,nrow=3))
+sapply(colnames(nb.data), function(x){
+  hist(as.numeric(nb.data[[x]]),main=x,xlab=round(shapiro.test(nb.data[[x]])$p.value,5),
+       col="green",cex.main=2)
+})
+
+##Anderson-Darling test
+
+library(nortest)
+ad.test(nb.data$count_ratings_total)
+ad.test(nb.data$count_ratings_family)
+ad.test(nb.data$count_ratings_couple)
+ad.test(nb.data$count_ratings_single)
+ad.test(nb.data$count_ratings_business)
+ad.test(nb.data$foto_count)
+ad.test(nb.data$number_of_rooms)
+ad.test(nb.data$hotel_price)
+ad.test(nb.data$distance_to_sight1)
+ad.test(nb.data$distance_to_sight2)
+ad.test(nb.data$distance_to_sight3)
+ad.test(nb.data$distance_to_city_center)
+sapply(colnames(nb.data), function(x){
+  ad.test(as.numeric(nb.data[[x]]))
+})
+layout(matrix(1:12, ncol=4,nrow=3))
+sapply(colnames(nb.data), function(x){
+  hist(as.numeric(nb.data[[x]]),main=x,xlab=round(ad.test(nb.data[[x]])$p.value,5),
+       col="green",cex.main=2)
+})
+
+
+##### ---------- /DISTRIBUTIONS AND NORMALITY TEST ---------- #####
 
 ##### ---------- CORRELATION, REGRESSION, BARPLOT, QQPLOT ANALYSIS ---------- #####
+## correlation
+library(corrplot)
 
-################## WORK IN PROGRESS
+# correlation (non-binary data)
+p.cor <- cor(hotels.noNA[c(60, 3:5, 8, 13, 64)])
+par(mfrow = c(1,1))
+corrplot(p.cor, method = "shade")
 
+# correlation (non-binary + "count.features")
+count.features <- rowSums( hotels.noNA[,15:59] )
+hotels.noNA.f <- cbind(hotels.noNA, count.features)
+f.cor <- cor(hotels.noNA.f[c(3:5, 8:14,60:65)])
+corrplot(f.cor, method = "shade")
+
+## Regression
+#regression count.ratings.total & binary features
+hotels.features.lm = hotels.total[,c(4,15:59)]
+features.lm.noNA =na.omit(hotels.features.lm)
+
+regression.countings <- lm(count_ratings_total ~.
+                           , data = features.lm.noNA
+)
+
+summary(regression.countings)
+coefficients(regression.countings) # model coefficients
+anova(regression.countings)
+
+#regression countings with selected features
+
+regression.countings.sf <- lm(count_ratings_total ~
+                                f10_Concierge
+                              +f16_HotTub
+                              + f17_Golfcourse
+                              + f18_Suites
+                              + f21_Kitchenette
+                              + f27_ShuttleBusService
+                              + f30_BanquetRoom
+                              + f31_Self.ServeLaundry
+                              + f33_ConferenceFacilities
+                              + f36_Non.SmokingHotel
+                              , data = features.lm.noNA
+)
+summary(regression.countings.sf)
+
+
+## Bar chart
+
+# stacked bar chart with the number of reviewers by type
+
+reviewer.type <- hotels.noNA[,c(9:12)]
+reviewer.type.T <- t(reviewer.type)
+colnames(reviewer.type.T) <- hotels.noNA[,1]
+png("~/Desktop/type.png", width = 500, height = 300)
+par(mar=c(5,12,4,2)+0.1,mgp=c(3,1,0))
+bp <- barplot(as.matrix(reviewer.type.T), main="# of reviewers by type", 
+              las=1, horiz = TRUE, col=c("grey70","darkred","grey78","rosybrown1"), 
+              cex.names = 0.8,cex.axis=0.8)
+dev.off()
+
+# bar chart for the number of features
+count.features.a <- rowSums(hotels[,15:54])
+cf.data <- data.frame(hotels$hotel_name, count.features.a)
+cf.ordered <- cf.data[order(cf.data[,2],decreasing=TRUE),]
+png("~/Desktop/count_features.png", width = 1000, height = 500)
+par(mar=c(5,10,4,2)+0.1,mgp=c(3,1,0))
+cf.bp <-barplot(cf.ordered[,2], names.arg = cf.ordered[,c(1)], horiz= T, las=1, xlab = "The number of features in hotel",  
+                cex.names = 0.8,cex.axis=0.8)
+dev.off()
+
+
+
+## pairsplot
+
+# pairsplot with non-binary variables (selected)
+
+panel.hist <- function(x, ...)
+{
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(usr[1:2], 0, 1.5) )
+  h <- hist(x, plot = FALSE)
+  breaks <- h$breaks; nB <- length(breaks)
+  y <- h$counts; y <- y/max(y)
+  rect(breaks[-nB], 0, breaks[-1], y, col=rgb(82,125,162, maxColorValue = 255))
+}
+
+panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
+{
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  r <- abs(cor(x, y))
+  txt <- format(c(r, 0.123456789), digits = digits)[1]
+  txt <- paste0(prefix, txt)
+  if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
+  text(0.5, 0.5, txt, cex = cex.cor * r * 5)
+}
+
+pairs(hotels.noNA[c(3:5,8:13,60)], cex = 0.4, pch = 21, col = "dodgerblue3", bg = "azure", diag.panel = panel.hist, upper.panel = panel.cor)
 ##### ---------- /CORRELATION, REGRESSION, BARPLOT, QQPLOT ANALYSIS ---------- #####
 
 
@@ -256,3 +454,55 @@ hier.anovadot.best.match = getBestMatchCluster(mappableHotels,
 
 
 
+##### ---------- MAP BEST MATCHING CLUSTERS ---------- #####
+library(ggmap)
+
+meanLat = mean(hotels.total$latitude, na.rm = TRUE)
+meanLon = mean(hotels.total$longitude, na.rm = TRUE)
+gmapsObject <- get_map(location = c(lon = meanLon, lat = meanLat), color = "color", source = "google", maptype = "roadmap", zoom = 12)
+
+getCoordinatesForHotelCluster <- function(mappableHotels, clusters, cluster) {
+  indices = which(clusters == cluster)
+  hotels = mappableHotels[indices, ]
+  data.frame(lat = hotels[, "latitude"], lon = hotels[, "longitude"])
+}
+
+plotClustersOnMap <- function(gmapsObject, coord.cl1, coord.cl2, coord.attrac) {
+  # gmap <- ggmap(gmapsObject, extent = "panel")
+  gmap <- ggmap(gmapsObject, extent = "normal")
+  
+  gmap + labs(x = 'Longitude', y = 'Latitude') + ggtitle("Tripadvisor Hotels & Attractions") +
+    geom_point(data = coord.cl1, color = "red", size = 5, alpha = 0.5) +
+    geom_point(data = coord.cl2, color = "blue", size = 5, alpha = 0.5) +
+    geom_point(data = coord.attrac, color = "darkorange", size = 5, shape = 1)
+}
+
+coordinatesAttractions = data.frame(lat = top3attractions[, "latitude"], lon = top3attractions[, "longitude"])
+
+coordinateshotels.hier.rbfdot.1 = getCoordinatesForHotelCluster(mappableHotels, hierarchical.four.clusters, hier.rbfdot.best.match[1])
+coordinateshotels.hier.rbfdot.2 = getCoordinatesForHotelCluster(mappableHotels, kkmeans.rbfdot.four.clusters, hier.rbfdot.best.match[2])
+
+coordinateshotels.hier.polydot.1 = getCoordinatesForHotelCluster(mappableHotels, hierarchical.four.clusters, hier.polydot.best.match[1])
+coordinateshotels.hier.polydot.2 = getCoordinatesForHotelCluster(mappableHotels, kkmeans.polydot.four.clusters, hier.polydot.best.match[2])
+
+coordinateshotels.hier.vanilladot.1 = getCoordinatesForHotelCluster(mappableHotels, hierarchical.four.clusters, hier.vanilladot.best.match[1])
+coordinateshotels.hier.vanilladot.2 = getCoordinatesForHotelCluster(mappableHotels, kkmeans.vanilladot.four.clusters, hier.vanilladot.best.match[2])
+
+coordinateshotels.hier.laplacedot.1 = getCoordinatesForHotelCluster(mappableHotels, hierarchical.four.clusters, hier.laplacedot.best.match[1])
+coordinateshotels.hier.laplacedot.2 = getCoordinatesForHotelCluster(mappableHotels, kkmeans.laplacedot.four.clusters, hier.laplacedot.best.match[2])
+
+coordinateshotels.hier.besseldot.1 = getCoordinatesForHotelCluster(mappableHotels, hierarchical.four.clusters, hier.besseldot.best.match[1])
+coordinateshotels.hier.besseldot.2 = getCoordinatesForHotelCluster(mappableHotels, kkmeans.besseldot.four.clusters, hier.besseldot.best.match[2])
+
+coordinateshotels.hier.anovadot.1 = getCoordinatesForHotelCluster(mappableHotels, hierarchical.four.clusters, hier.anovadot.best.match[1])
+coordinateshotels.hier.anovadot.2 = getCoordinatesForHotelCluster(mappableHotels, kkmeans.anovadot.four.clusters, hier.anovadot.best.match[2])
+
+pdf(file='cluster_movement.pdf')
+  plotClustersOnMap(gmapsObject, coordinateshotels.hier.rbfdot.1, coordinateshotels.hier.rbfdot.2, coordinatesAttractions)
+  plotClustersOnMap(gmapsObject, coordinateshotels.hier.polydot.1, coordinateshotels.hier.polydot.2, coordinatesAttractions)
+  plotClustersOnMap(gmapsObject, coordinateshotels.hier.vanilladot.1, coordinateshotels.hier.vanilladot.2, coordinatesAttractions)
+  plotClustersOnMap(gmapsObject, coordinateshotels.hier.laplacedot.1, coordinateshotels.hier.laplacedot.2, coordinatesAttractions)
+  plotClustersOnMap(gmapsObject, coordinateshotels.hier.besseldot.1, coordinateshotels.hier.besseldot.2, coordinatesAttractions)
+  plotClustersOnMap(gmapsObject, coordinateshotels.hier.anovadot.1, coordinateshotels.hier.anovadot.2, coordinatesAttractions)
+dev.off()
+##### ---------- /MAP BEST MATCHING CLUSTERS ---------- #####
