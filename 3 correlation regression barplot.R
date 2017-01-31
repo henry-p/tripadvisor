@@ -1,4 +1,3 @@
-##### ---------- CORRELATION, REGRESSION, BARPLOT, QQPLOT ANALYSIS ---------- #####
 ## correlation
 library(corrplot)
 
@@ -51,21 +50,23 @@ summary(regression.countings.sf)
 reviewer.type <- hotels.noNA[,c(9:12)]
 reviewer.type.T <- t(reviewer.type)
 colnames(reviewer.type.T) <- hotels.noNA[,1]
-png("~/Desktop/type.png", width = 500, height = 300)
+png("~/Desktop/type.png", width = 1000, height = 600)
 par(mar=c(5,12,4,2)+0.1,mgp=c(3,1,0))
 bp <- barplot(as.matrix(reviewer.type.T), main="# of reviewers by type", 
               las=1, horiz = TRUE, col=c("grey70","darkred","grey78","rosybrown1"), 
               cex.names = 0.8,cex.axis=0.8)
+legend("topright", legend = colnames(reviewer.type), 
+       fill = c("grey70","darkred","grey78","rosybrown1"))
 dev.off()
 
 # bar chart for the number of features
 count.features.a <- rowSums(hotels[,15:54])
 cf.data <- data.frame(hotels$hotel_name, count.features.a)
 cf.ordered <- cf.data[order(cf.data[,2],decreasing=TRUE),]
-png("~/Desktop/count_features.png", width = 1000, height = 500)
-par(mar=c(5,10,4,2)+0.1,mgp=c(3,1,0))
+png("~/Desktop/count_features.png", width = 1000, height = 700)
+par(mar=c(7,10,4,2)+3, mgp=c(4,0.8,0))
 cf.bp <-barplot(cf.ordered[,2], names.arg = cf.ordered[,c(1)], horiz= T, las=1, xlab = "The number of features in hotel",  
-                cex.names = 0.8,cex.axis=0.8)
+                cex.names = 0.7,cex.axis=0.7)
 dev.off()
 
 
@@ -96,4 +97,4 @@ panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
 }
 
 pairs(hotels.noNA[c(3:5,8:13,60)], cex = 0.4, pch = 21, col = "dodgerblue3", bg = "azure", diag.panel = panel.hist, upper.panel = panel.cor)
-##### ---------- /CORRELATION, REGRESSION, BARPLOT, QQPLOT ANALYSIS ---------- #####
+

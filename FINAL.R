@@ -44,6 +44,68 @@ z = c(FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE)
 rgl::plot3d(x = x, y = y, z = z, size = 10, col = "steelblue", expand=1.2)
 ##### ---------- /DATA VISUALIZATION EXAMPLE ---------- #####
 
+##### ---------- HOTELS ON THE MAP VISUALIZATIONS ---------- #####
+
+#install.packages("ggmap")
+library(ggmap)
+
+meanLat = mean(hotels.total$latitude, na.rm = TRUE)
+meanLon = mean(hotels.total$longitude, na.rm = TRUE)
+
+coordinatesHotels = data.frame(lat = hotels.total[, "latitude"], lon = hotels.total[, "longitude"])
+coordinatesAttractions = data.frame(lat = tripadvisor3$top3attractions[, "latitude"], lon = tripadvisor3$top3attractions[, "longitude"])
+
+gmapsObject <- get_map(location = c(lon = meanLon, lat = meanLat),
+                       color = "color",
+                       source = "google",
+                       maptype = "roadmap",
+                       zoom = 12)
+
+gmap <- ggmap(gmapsObject, extent = "panel")
+
+#initial presentation of position of hotels and attractions
+gmap + labs(x = 'Longitude', y = 'Latitude') + ggtitle("Tripadvisor Hotels & Attractions") +
+  geom_point(data = coordinatesHotels, color = "cornflowerblue", size = 2) + 
+  labs(title = "M?nster", x = "Longitude", y = "Latitude") +
+  geom_point(data = coordinatesAttractions, color = "firebrick2", size = 2)
+
+#categorize the price
+pricerange = ifelse(hotels.total$hotel_price <93, "1", ifelse(hotels.total$hotel_price >= 93 & hotels.total$hotel_price < 116, "2", ifelse(hotels.total$hotel_price > 140, "3", "4")))
+
+#rating and price on the map
+gmap + labs(x = 'Longitude', y = 'Latitude') + ggtitle("Tripadvisor Hotels & Attractions") +
+  geom_point(data = coordinatesHotels, aes(color = factor(pricerange), size = hotels.total$rating_total)) + 
+  labs(title = "M?nster", x = "Longitude", y = "Latitude", color = "Price", size = "Rating") +
+  scale_color_discrete(labels = c("Budget <93 EUR", "Medium 93 - 116 EUR", "Luxury > 116 EUR")) +
+  geom_point(data = coordinatesAttractions, color = "firebrick2", size = 2)
+
+
+#distance to center categories
+distcat = ifelse(hotels.total$distance_to_city_center < 1, "1", ifelse(hotels.total$distance_to_city_center >= 1 & hotels.total$distance_to_city_center < 3, "2", ifelse(hotels.total$distance_to_city_center > 7, "4", "3")))
+
+#distance from center with City Ranking
+gmap + labs(x = 'Longitude', y = 'Latitude') + ggtitle("Tripadvisor Hotels & Attractions") +
+  geom_point(data = coordinatesHotels, aes(color = factor(distcat), size = hotels.total$city_ranking)) + 
+  labs(title = "M?nster", x = "Longitude", y = "Latitude", color = "Location", size = "City Ranking") +
+  scale_color_discrete(labels = c("Central", "Good Location", "Far from center","Outside of city")) +
+  geom_point(data = coordinatesAttractions, color = "firebrick2", size = 2)
+
+#stars and count ratings
+gmap + labs(x = 'Longitude', y = 'Latitude') + ggtitle("Tripadvisor Hotels & Attractions") +
+  geom_point(data = coordinatesHotels, aes(color = factor(hotels.total$hotel_stars), size = hotels.total$count_ratings_total)) + 
+  labs(title = "M?nster", x = "Longitude", y = "Latitude", color = "Stars", size = "Count Rating") +
+  geom_point(data = coordinatesAttractions, color = "firebrick2", size = 2)
+
+#stars and number of rooms
+gmap + labs(x = 'Longitude', y = 'Latitude') + ggtitle("Tripadvisor Hotels & Attractions") +
+  geom_point(data = coordinatesHotels, aes(color = factor(hotels.total$hotel_stars), size = hotels.total$number_of_rooms)) + 
+  labs(title = "M?nster", x = "Longitude", y = "Latitude", color = "Stars", size = "Number of Rooms") +
+  geom_point(data = coordinatesAttractions, color = "firebrick2", size = 2)
+
+
+##### ---------- /HOTELS ON THE MAP VISUALIZATIONS ---------- #####
+
+
 ##### ---------- DISTRIBUTIONS AND NORMALITY TEST ---------- #####
 
 checkdistr = hotels.total[c(3,4,8:14,60, 64)]
@@ -125,6 +187,7 @@ sapply(colnames(nb.data), function(x){
 
 ##Anderson-Darling test
 
+# install.packages("nortest")
 library(nortest)
 ad.test(nb.data$count_ratings_total)
 ad.test(nb.data$count_ratings_family)
@@ -203,21 +266,23 @@ summary(regression.countings.sf)
 reviewer.type <- hotels.noNA[,c(9:12)]
 reviewer.type.T <- t(reviewer.type)
 colnames(reviewer.type.T) <- hotels.noNA[,1]
-png("~/Desktop/type.png", width = 500, height = 300)
+png("~/Desktop/type.png", width = 1000, height = 600)
 par(mar=c(5,12,4,2)+0.1,mgp=c(3,1,0))
 bp <- barplot(as.matrix(reviewer.type.T), main="# of reviewers by type", 
               las=1, horiz = TRUE, col=c("grey70","darkred","grey78","rosybrown1"), 
               cex.names = 0.8,cex.axis=0.8)
+legend("topright", legend = colnames(reviewer.type), 
+       fill = c("grey70","darkred","grey78","rosybrown1"))
 dev.off()
 
 # bar chart for the number of features
-count.features.a <- rowSums(hotels[,15:54])
-cf.data <- data.frame(hotels$hotel_name, count.features.a)
+count.features.a <- rowSums(hotels.total[,15:54])
+cf.data <- data.frame(hotels.total$hotel_name, count.features.a)
 cf.ordered <- cf.data[order(cf.data[,2],decreasing=TRUE),]
-png("~/Desktop/count_features.png", width = 1000, height = 500)
-par(mar=c(5,10,4,2)+0.1,mgp=c(3,1,0))
+png("~/Desktop/count_features.png", width = 1000, height = 700)
+par(mar=c(7,10,4,2)+3, mgp=c(4,0.8,0))
 cf.bp <-barplot(cf.ordered[,2], names.arg = cf.ordered[,c(1)], horiz= T, las=1, xlab = "The number of features in hotel",  
-                cex.names = 0.8,cex.axis=0.8)
+                cex.names = 0.7,cex.axis=0.7)
 dev.off()
 
 
@@ -253,9 +318,96 @@ pairs(hotels.noNA[c(3:5,8:13,60)], cex = 0.4, pch = 21, col = "dodgerblue3", bg 
 
 
 ##### ---------- DIMENSIONALITY REDUCTION ---------- #####
+# install.packages("randomForest")
+# install.packages("rgl")
+# install.packages("gplots")
+library(randomForest)
+library(rgl)
+library(gplots)
+# reductionData <- get Features from CleanData
+features.scaled <- as.data.frame(apply(hotels.features *1, 2, scale))
+reductionResult = prcomp(features.scaled)
+var <- reductionResult$sdev^2/sum(reductionResult$sdev^2)
+barplot(var, xlab = "PCs", names.arg = c(1:40), ylab = "Variance")
+plot(cumsum(var), xlab = "PCs", ylab = "cum. Variance", ylim = c(0,1))
+abline(h=0.75, col="red", lty = 2)
+abline(v=10, col="red", lty = 2)
+abline(h=0.9, col="blue", lty = 2)
+abline(v=17, col="blue", lty = 2)
+abline(h=0.95, col="green", lty = 2)
+abline(v=21, col="green", lty = 2)
+abline(h=0.99, col="orange", lty = 2)
+abline(v=28, col="orange", lty = 2)
+summary(reductionResult)
 
-################## WORK IN PROGRESS
+# BiPlot
+biplot(reductionResult)
+# 3D Biplot
+pcX <- apply(reductionResult$x[,1:3], 2, scale)
+pcR <- apply(reductionResult$rotation[,1:3], 2, scale)
+plot3d(pcX)
+text3d(pcX, texts = paste0("H_", c(1:40)))
+text3d(pcR, texts = paste0("F_", c(1:40)), col="cornflowerblue")
+coords <- NULL
+for (i in 1:nrow(pcR)) {
+  coords <- rbind(coords, rbind(c(0,0,0),pcR[i,1:3]))
+}
+lines3d(coords, col="cornflowerblue", lwd=1)
 
+
+# Linear Regression importance of features
+priceS <- cbind(scale(hotels.total$hotel_price), features.scaled)
+priceS <- na.omit(priceS)
+regPrice <- lm(`scale(hotels.total$hotel_price)` ~., data = priceS)
+summary(regPrice)
+
+ratingS <- cbind(scale(hotels.total$rating_total), features.scaled)
+ratingS <- na.omit(ratingS)
+regRatings <- lm(`scale(hotels.total$rating_total)` ~., data = ratingS)
+summary(regRatings)
+
+# Random Forrest importance of features
+impPriceT = c()
+for (i in 1:100){
+  rfPrice <- randomForest(`scale(hotels.total$hotel_price)` ~., data = priceS, importance=TRUE)
+  impPriceT <- cbind(impPriceT, importance(rfPrice, type=1))
+}
+impPrice = apply(impPriceT, 1, mean)
+barplot(impPrice[which(impPrice != 0)], names.arg=abbreviate(names(impPrice)[which(impPrice != 0)]), horiz= T, las=1, xlab = "Influence on Price")
+
+impRatingT = c()
+for (i in 1:100){
+  rfRating <- randomForest(`scale(hotels.total$rating_total)` ~., data = ratingS, importance=TRUE)
+  impRatingT <- cbind(impRatingT, importance(rfRating, type=1))
+}
+impRating = apply(impRatingT, 1, mean)
+barplot(impRating[which(impRating != 0)], names.arg=abbreviate(names(impRating)[which(impRating != 0)]), horiz= T, las=1, xlab = "Influence on Rating")
+
+# Feature selection based on PCA
+rrMat <- reductionResult$rotation[,1:17]
+sDev <- reductionResult$sdev[1:17]
+var <- sDev^2/sum(sDev^2)
+var = var / sum(var) # normalising var
+fRotation <- abs(rrMat)
+fRotation <- apply(fRotation, 2, function(col) { col / sum(col)})
+fRotation <- t(t(fRotation) * var)
+fPCA = apply(fRotation, 1, sum)
+names(fPCA) = rownames(rrMat)[order(fPCA)]
+fPCA = fPCA[order(fPCA)]
+print(fPCA)
+
+#dev.off()
+rrHM <- reductionResult$rotation[,1:10]
+rownames(rrHM) <- paste0("F_", c(1:40))
+heatmap.2(rrHM, dendrogram = "none", Rowv = FALSE, Colv = FALSE, col=redgreen(100))
+
+# Count Trues
+cnt <- data.frame(1:45, apply(hotels.total[c(15:59)], 2, function(col) as.numeric(round(sum(1*col) / length(col) * 100))))
+ordered = order(cnt[,2], decreasing = T)
+cntOrdered = cnt[order(cnt[,2]),]
+names = paste0("F_", cntOrdered[,1])
+brplt <- barplot(cntOrdered[,2], names.arg = names, horiz= T, las=1, xlab = "Proportion of hotels in percentage", ylab = "Feature")
+text(x= cntOrdered[,2]+1, y= brplt, labels=as.character(cntOrdered[,2]), xpd=TRUE)
 ##### ---------- /DIMENSIONALITY REDUCTION ---------- #####
 
 
@@ -265,7 +417,6 @@ pairs(hotels.noNA[c(3:5,8:13,60)], cex = 0.4, pch = 21, col = "dodgerblue3", bg 
 wss <- 0
 for (i in 1:20) wss[i] <- sum(kmeans(PCs,centers=i)$withinss)
 plot(1:20, wss, type="b", xlab="Number of Clusters", ylab="Within groups sum of squares")
-
 
 ## HClust (only ward.d and ward.d2)
 clustersD <- hclust(dist(PCs), method = "ward.D")

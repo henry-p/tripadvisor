@@ -12,8 +12,8 @@ getCoordinatesForHotelCluster <- function(mappableHotels, clusters, cluster) {
 }
 
 plotClustersOnMap <- function(gmapsObject, coord.cl1, coord.cl2, coord.attrac) {
-  # gmap <- ggmap(gmapsObject, extent = "panel")
-  gmap <- ggmap(gmapsObject, extent = "normal")
+  gmap <- ggmap(gmapsObject, extent = "panel")
+  # gmap <- ggmap(gmapsObject, extent = "normal")
   
   gmap + labs(x = 'Longitude', y = 'Latitude') + ggtitle("Tripadvisor Hotels & Attractions") +
     geom_point(data = coord.cl1, color = "red", size = 5, alpha = 0.5) +
