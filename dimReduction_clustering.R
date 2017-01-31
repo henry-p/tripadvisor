@@ -18,6 +18,7 @@ summary(reductionResult)
 
 # BiPlot
 biplot(reductionResult)
+<<<<<<< HEAD
 # 3D Biplot
 plot3d(reductionResult$x[,1:3])
 #text3d(reductionResult$sdev[1:3], texts = colnames(reductionResult)[1:3])
@@ -28,6 +29,9 @@ for (i in 1:nrow(reductionResult$rotation)) {
 }
 lines3d(coords, col="red", lwd=1)
 
+=======
+#dimdesc(reductionResult)
+>>>>>>> 800b8eb83fd38c1c9efa92d220aad5df2cddf9c1
 
 # Linear Regression importance of features
 priceS <- cbind(scale(hotels.total$hotel_price), features.scaled)
@@ -41,6 +45,7 @@ regRatings <- lm(`scale(hotels.total$rating_total)` ~., data = ratingS)
 summary(regRatings)
 
 # Random Forrest importance of features
+<<<<<<< HEAD
 impPriceT = c()
 for (i in 1:100){
   rfPrice <- randomForest(`scale(hotels.total$hotel_price)` ~., data = priceS, importance=TRUE)
@@ -66,6 +71,22 @@ fRotation <- apply(fRotation, 2, function(col) { (col - min(col)/(max(col)-min(c
 fRotation <- t(t(fRotation) * var)
 fPCA = apply(fRotation, 1, sum)
 names(fPCA) = rownames(rrMat)[order(fPCA)]
+=======
+rfPrice <- randomForest(`scale(hotels.total$hotel_price)` ~., data = priceS, importance=TRUE)
+impPrice <- importance(rfPrice, type=1)
+barplot(impPrice[which(impPrice != 0)], names.arg=abbreviate(rownames(impPrice)[which(impPrice != 0)]), horiz= T, las=1, xlab = "Influence on Price")
+
+rfRating <- randomForest(`scale(hotels.total$rating_total)` ~., data = ratingS, importance=TRUE)
+impRating <- importance(rfRating, type=1)
+barplot(impRating[which(impRating != 0)], names.arg=abbreviate(rownames(impRating)[which(impRating != 0)]), horiz= T, las=1, xlab = "Influence on Rating")
+
+# Feature selection based on PCA
+var <- reductionResult$sdev^2/sum(reductionResult$sdev^2)
+fRotation <- abs(reductionResult$rotation)
+fRotation <- apply(fRotation, 2, function(col) {col/sum(col)})
+fRotation <- t(t(fRotation) * var)
+fPCA = apply(fRotation, 1, sum)
+>>>>>>> 800b8eb83fd38c1c9efa92d220aad5df2cddf9c1
 fPCA = fPCA[order(fPCA)]
 
 # Count Trues
